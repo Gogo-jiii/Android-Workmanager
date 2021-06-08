@@ -41,4 +41,5 @@ dependencies {
 
     // (Java only)
     implementation "androidx.work:work-runtime:$work_version"
+    implementation 'androidx.concurrent:concurrent-listenablefuture-callback:1.0.0-beta01'
 }

@@ -14,33 +14,33 @@ import androidx.work.WorkerParameters;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SimpleWork extends Worker {
+public class MyOneTimeWork extends Worker {
 
-    private ExecutorService executorService;
     private Handler handler;
     private Context context;
     public static boolean isStopped;
     private int progress = 10;
 
-    public SimpleWork(@NonNull Context context,
-                      @NonNull WorkerParameters workerParams) {
+    public MyOneTimeWork(@NonNull Context context,
+                         @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
 
-        executorService = Executors.newSingleThreadExecutor();
         handler = new Handler(Looper.getMainLooper());
         this.context = context;
         setProgressAsync(new Data.Builder().putInt("PROGRESS", 0).build());
+        isStopped = false;
     }
 
     @NonNull @Override public Result doWork() {
         String inputData = getInputData().getString("key");
         handler.post(new Runnable() {
             @Override public void run() {
-                Toast.makeText(context, "inputData: " + inputData, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "one time work inputData: " + inputData,
+                        Toast.LENGTH_SHORT).show();
             }
         });
 
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= 5; i++) {
             if (isStopped) {
                 break;
             }
@@ -51,7 +51,7 @@ public class SimpleWork extends Worker {
                 @Override public void run() {
                     //ui task
                     Log.d("TAG", String.valueOf(data));
-                    Toast.makeText(context, "Data: " + data, Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "One time work data: " + data, Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -63,6 +63,8 @@ public class SimpleWork extends Worker {
             }
         }
 
-        return Result.success();
+        //output data
+        Data outputData = new Data.Builder().putString("output", "Some_Output_Data").build();
+        return Result.success(outputData);
     }
 }
